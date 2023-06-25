@@ -1,5 +1,6 @@
 package com.inkapplications.ack.android.settings
 
+import com.inkapplications.ack.android.symbol.SymbolFactory
 import dagger.Reusable
 import javax.inject.Inject
 
@@ -7,7 +8,9 @@ import javax.inject.Inject
  * Creates view state objects based on settings data.
  */
 @Reusable
-class SettingsViewStateFactory @Inject constructor() {
+class SettingsViewStateFactory @Inject constructor(
+    private val symbolFactory: SymbolFactory,
+) {
     /**
      * Create a view state object based on the user's current license data.
      */
@@ -24,5 +27,15 @@ class SettingsViewStateFactory @Inject constructor() {
      */
     fun viewState(data: List<SettingsGroup>): SettingsListViewState {
         return SettingsListViewState.Loaded(settingsList = data)
+    }
+
+    fun transmitIconState(data: TransmitSettingsData): TransmitSettingsButtonState {
+        return when {
+            data.address == null -> TransmitSettingsButtonState.Hidden
+            else -> TransmitSettingsButtonState.Enabled(
+                icon = symbolFactory.createSymbol(data.symbol),
+                text = data.message,
+            )
+        }
     }
 }

@@ -42,8 +42,11 @@ class SettingsViewModel @Inject constructor(
         .map { buildInfoFactory.buildInfo(it) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, BuildInfoState.Initial)
 
+    val transmitSettingsState: StateFlow<TransmitSettingsButtonState> = settingsAccess.transmitSettingsData
+        .map { settingsViewStateFactory.transmitIconState(it) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, TransmitSettingsButtonState.Hidden)
+
     fun showAdvanced() {
         advanced.value = true
     }
 }
-

@@ -68,6 +68,7 @@ class TransmitSettings @Inject constructor(
         defaultData = Symbol.Primary('$'),
         categoryName = resources.getString(R.string.transmit_settings_category),
         transformer = SymbolTransformer,
+        advanced = true,
     )
 
     val destination = StringBackedSetting(
@@ -84,6 +85,7 @@ class TransmitSettings @Inject constructor(
         name = resources.getString(R.string.transmit_settings_comment),
         defaultValue = "Hello!",
         categoryName = resources.getString(R.string.transmit_settings_category),
+        advanced = true,
     )
 
     val volume = IntBackedSetting(

@@ -5,6 +5,7 @@ import androidx.activity.viewModels
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.inkapplications.ack.android.settings.agreement.UserAgreementActivity
 import com.inkapplications.ack.android.settings.license.LicenseEditActivity
+import com.inkapplications.ack.android.settings.transmit.TransmitSettingsActivity
 import com.inkapplications.android.extensions.ExtendedActivity
 import com.inkapplications.android.startActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,5 +73,10 @@ class SettingsActivity: ExtendedActivity(), SettingsController {
     override fun onLicensesClick() {
         Kimchi.trackEvent("settings_show_licenses")
         startActivity(OssLicensesMenuActivity::class)
+    }
+
+    override fun onTransmitSettingsClick() {
+        Kimchi.trackEvent("settings_transmit_edit")
+        startActivity(TransmitSettingsActivity::class)
     }
 }

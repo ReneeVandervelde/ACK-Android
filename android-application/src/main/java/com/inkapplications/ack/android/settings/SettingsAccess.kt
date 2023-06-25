@@ -2,7 +2,12 @@ package com.inkapplications.ack.android.settings
 
 import com.inkapplications.ack.android.connection.ConnectionSettings
 import com.inkapplications.ack.android.settings.license.LicensePromptFieldValues
+import com.inkapplications.ack.android.transmit.TransmitSettings
+import com.inkapplications.ack.structures.Symbol
+import com.inkapplications.ack.structures.station.Callsign
+import com.inkapplications.ack.structures.station.StationAddress
 import com.inkapplications.ack.structures.station.toStationAddress
+import com.inkapplications.android.extensions.combineApply
 import com.inkapplications.coroutines.mapItems
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -15,6 +20,7 @@ class SettingsAccess @Inject constructor(
     private val settingValues: SettingsReadAccess,
     private val settingsStorage: SettingsWriteAccess,
     private val connectionSettings: ConnectionSettings,
+    private val transmitSettings: TransmitSettings,
 ) {
     fun settingsGroups(advanced: Boolean): Flow<List<SettingsGroup>> {
         return settingsProvider.settings
@@ -57,6 +63,17 @@ class SettingsAccess @Inject constructor(
             LicensePromptFieldValues(callsign?.toString().orEmpty(), passcode?.toString().orEmpty())
         }
 
+    val transmitSettingsData: Flow<TransmitSettingsData> = settingValues.observeData(transmitSettings.symbol)
+        .combine(settingValues.observeString(transmitSettings.comment)) { symbol, comment ->
+            TransmitSettingsData().apply {
+                this.symbol = symbol
+                this.message = comment
+            }
+        }
+        .combineApply(settingValues.observeData(connectionSettings.address)) { address ->
+            this.address = address
+        }
+
     fun setLicense(values: LicensePromptFieldValues) {
         settingsStorage.setData(connectionSettings.address, values.callsign.trim().takeIf { it.isNotEmpty() }?.toStationAddress())
         settingsStorage.setData(connectionSettings.passcode, Passcode(values.passcode.trim().toIntOrNull() ?: -1))
@@ -79,4 +96,10 @@ class SettingsAccess @Inject constructor(
             ?: throw IllegalArgumentException("Unknown Boolean Setting: <$key>")
         settingsStorage.setBoolean(setting, value)
     }
+}
+
+class TransmitSettingsData {
+    lateinit var symbol: Symbol
+    lateinit var message: String
+    var address: StationAddress? = null
 }

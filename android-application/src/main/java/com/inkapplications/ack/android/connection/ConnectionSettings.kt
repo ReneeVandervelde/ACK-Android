@@ -40,6 +40,7 @@ class ConnectionSettings @Inject constructor(
                 override fun toData(storage: Int): Passcode? = storage.takeIf { it != -1 }?.let(::Passcode)
             },
         ),
+        advanced = true,
     )
 
     val server = StringSetting(

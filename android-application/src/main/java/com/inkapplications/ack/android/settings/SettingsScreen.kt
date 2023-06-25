@@ -2,14 +2,19 @@ package com.inkapplications.ack.android.settings
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RestartAlt
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.inkapplications.ack.android.R
+import com.inkapplications.ack.android.capture.log.AprsSymbol
 import com.inkapplications.ack.android.input.IntPrompt
 import com.inkapplications.ack.android.input.StringPrompt
 import com.inkapplications.ack.android.settings.buildinfo.BuildInfo
@@ -18,6 +23,7 @@ import com.inkapplications.ack.android.ui.theme.AckScreen
 import com.inkapplications.ack.android.ui.theme.AckTheme
 import com.inkapplications.ack.android.ui.NavigationRow
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -31,6 +37,38 @@ fun SettingsScreen(
             onBackPressed = controller::onBackPressed,
         )
         LicenseRow(viewModel.licenseState.collectAsState(), controller)
+
+        when (val transmitState = viewModel.transmitSettingsState.collectAsState().value) {
+            is TransmitSettingsButtonState.Hidden -> {}
+            is TransmitSettingsButtonState.Enabled -> {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(24.dp),
+                        elevation = 1.dp,
+                        border = null,
+                        onClick = controller::onTransmitSettingsClick,
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(AckTheme.spacing.item),
+                        ) {
+                            Icon(
+                                Icons.Default.RestartAlt,
+                                contentDescription = "Repeating",
+                            )
+                            AprsSymbol(symbol = transmitState.icon)
+                            Text(transmitState.text, style = AckTheme.typography.body)
+                        }
+                    }
+                }
+            }
+        }
+
+        
         val promptSetting = remember { mutableStateOf<SettingState?>(null) }
         when (val settingState = promptSetting.value) {
             is SettingState.IntState -> IntPrompt(
